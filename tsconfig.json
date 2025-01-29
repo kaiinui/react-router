@@ -1,0 +1,12 @@
+{
+  "extends": "@tsconfig/vite-react/tsconfig.json",
+  "include": [
+    "app",
+    ".react-router/types/**/*",
+    "worker-configuration.d.ts"
+  ],
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "rootDirs": [".", "./.react-router/types"],
+  }
+}
