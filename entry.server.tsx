@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // @see https://github.com/yusukebe/hono-react-router-adapter/blob/main/examples/cloudflare-workers/app/entry.server.tsx
 // `react-router reveal`のコードでは動かない。hono-react-router-adapterのサンプルを持ってくる必要がある。
 
