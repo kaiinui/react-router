@@ -1,7 +1,32 @@
-import handle from "hono-react-router-adapter/cloudflare-workers";
-import app from "./app/server/index";
-import { getLoadContext } from "./app/load-context";
-// @ts-ignore-next-line
-import * as build from "./build/server";
+// @ts-nocheck
 
-export default handle(build, app, { getLoadContext });
+import { createRequestHandler } from "react-router";
+import app from "./app/server";
+
+declare module "react-router" {
+	export interface AppLoadContext {
+		cloudflare: {
+			env: Env;
+			ctx: ExecutionContext;
+		};
+	}
+}
+
+const requestHandler = createRequestHandler(
+	() => import("virtual:react-router/server-build"),
+	import.meta.env.MODE,
+);
+
+// biome-ignore lint/style/noDefaultExport: framework
+export default {
+	async fetch(request, env, ctx) {
+		const honoResponse = await app.fetch(request, env, ctx);
+		if (honoResponse.ok) {
+			return honoResponse;
+		}
+
+		return requestHandler(request, {
+			cloudflare: { ctx, env },
+		});
+	},
+} satisfies ExportedHandler<Env>;

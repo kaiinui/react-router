@@ -1,18 +1,16 @@
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import serverAdapter from "hono-react-router-adapter/vite";
-import adapter from "@hono/vite-dev-server/cloudflare";
-import { getLoadContext } from "./app/load-context";
 
-export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    reactRouter(),
-    serverAdapter({
-      adapter,
-      getLoadContext,
-      entry: "./app/server/index.ts",
-    }),
-  ],
-});
+// biome-ignore lint/style/noDefaultExport: framework
+export default defineConfig(({ mode }) => ({
+	plugins: [
+		tailwindcss(),
+		reactRouter(),
+		// 現状、@cloudflare/vite-pluginはvitest環境では動作しないっぽい？
+		mode !== "test"
+			? cloudflare({ viteEnvironment: { name: "ssr" } })
+			: undefined,
+	],
+}));

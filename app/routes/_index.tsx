@@ -1,25 +1,27 @@
-import type { Route } from "./+types/home";
+import { internal } from "../server";
+import type { Route } from "./+types/_index";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
+export function meta() {
+	return [
+		{ title: "New React Router App" },
+		{ content: "Welcome to React Router!", name: "description" },
+	];
 }
 
-export function loader({
-  params,
-}: Route.LoaderArgs) {
-  console.log(params);
+export async function loader({ params }: Route.LoaderArgs) {
+	console.log(params);
+	const value = await internal.api.$get();
 
-  return {
-    foo: "bar"
-  };
+	return {
+		foo: await value.json(),
+	};
 }
 
-export default function Home({
-  loaderData,
-}: Route.ComponentProps) {
-  return <div>Home: loader foo = {loaderData.foo}</div>;
+// biome-ignore lint/style/noDefaultExport: framework
+export default function Home({ loaderData }: Route.ComponentProps) {
+	return (
+		<div className="p-4 font-bold text-amber-700">
+			Home: loader from Hono = {loaderData.foo.message}
+		</div>
+	);
 }
-
