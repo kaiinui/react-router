@@ -1,3 +1,4 @@
+import { env } from "cloudflare:workers";
 import { Hono } from "hono";
 import { hc } from "hono/client";
 
@@ -9,12 +10,10 @@ const router = app.get("/api", (c) => {
 	});
 });
 
-const selfFetch: typeof fetch = async (input, init) => {
-	const request = new Request(input, init);
-	return await app.fetch(request);
-};
-export const internal = hc<typeof router>("http://localhost.internal", {
-	fetch: selfFetch,
+export type Router = typeof router;
+export const internal = hc<Router>("http://localhost", {
+	// note: SELF.fetchはthisに依存しているため、bindする必要がある
+	fetch: env.SELF.fetch.bind(env.SELF),
 });
 // biome-ignore lint/style/noDefaultExport: framework
 export default app;
